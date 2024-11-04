@@ -1,0 +1,156 @@
+ML-4 K-means iris dataset
+
+
+
+! pip install pandas numpy matplotlib scikit-learn seaborn plotly nbformat 
+
+
+
+import pandas as pd 
+import numpy as np 
+import matplotlib.pyplot as plt 
+from sklearn.cluster import KMeans 
+import seaborn as sns
+
+
+
+
+
+data = pd.read_csv('Iris.csv')
+data
+
+
+
+
+
+data.columns
+
+
+
+
+
+for i,col in enumerate(data.columns):
+    print(f'Column number {1+i} is {col}')
+
+
+
+
+
+data.dtypes
+
+
+
+
+data.drop('Id', axis=1, inplace=True)
+data.head()
+
+
+
+
+
+
+data.isna().sum()
+
+
+
+
+
+target_data = data.iloc[:,4]
+target_data.unique()
+
+
+
+
+
+
+clustering_data = data.iloc[:,[0,1,2,3]]
+clustering_data.head()
+
+
+
+
+
+
+fig, ax = plt.subplots(figsize=(15,7))
+sns.set(font_scale=1.5)
+ax = sns.scatterplot(x=data['SepalLengthCm'],y=data['SepalWidthCm'], s=70, color='#f73434',
+edgecolor='#f73434', linewidth=0.3)
+ax.set_ylabel('Sepal Width (in cm)')
+ax.set_xlabel('Sepal Length (in cm)')
+plt.title('Sepal Length vs Width', fontsize = 20)
+plt.show()
+
+
+
+
+
+
+from sklearn.cluster import KMeans
+wcss=[]
+for i in range(1,11):
+    km = KMeans(i)
+
+km.fit(clustering_data)
+wcss.append(km.inertia_)
+np.array(wcss)
+
+
+
+
+
+
+kms = KMeans(n_clusters=3, init='k-means++')
+kms.fit(clustering_data)
+KMeans(n_clusters=3)
+
+
+
+
+
+
+clusters = clustering_data.copy()
+clusters['Cluster_Prediction'] = kms.fit_predict(clustering_data)
+clusters.head()
+
+
+
+
+
+
+kms.cluster_centers_
+
+
+
+
+
+import plotly.express as px
+
+cluster0 = clusters[clusters['Cluster_Prediction'] == 0]
+cluster1 = clusters[clusters['Cluster_Prediction'] == 1]
+cluster2 = clusters[clusters['Cluster_Prediction'] == 2]
+
+fig = px.scatter(clusters, x='SepalLengthCm', y='SepalWidthCm', color='Cluster_Prediction',
+                 size_max=30, opacity=0.7, title='Clusters', labels={'SepalLengthCm': 'Sepal Length (in cm)', 'SepalWidthCm': 'Sepal Width (in cm)'})
+
+fig.add_scatter(x=kms.cluster_centers_[:, 0], y=kms.cluster_centers_[:, 1], 
+                mode='markers', marker=dict(size=20, color='yellow', line=dict(color='black', width=1)),
+                name='Centroids')
+
+fig.for_each_trace(lambda t: t.update(name='Cluster ' + str(t.name)))
+
+fig.update_layout(legend_title_text='Clusters', xaxis_range=[4, 8], yaxis_range=[1.8, 4.5], xaxis_title='Sepal Length (in cm)', yaxis_title='Sepal Width (in cm)')
+fig.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
