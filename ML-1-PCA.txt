@@ -1,0 +1,112 @@
+ML-1-PCA
+
+! pip install pandas scikit-learn matplotlib
+
+
+
+import pandas as pd 
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
+import matplotlib.pyplot as plt
+
+
+df = pd.read_csv('Wine.csv')
+df
+
+
+
+df.keys()
+
+
+
+print(df.isnull().sum()) 
+
+
+
+X = df.drop('Customer_Segment', axis=1) # Features
+y = df['Customer_Segment'] 
+
+
+
+
+sc = StandardScaler() #Standardize features by removing the mean and scaling to 
+
+
+
+
+
+mean=0 
+standard_deviation=1
+
+"""
+'Customer_Segment', 
+'Alcohol', 
+'Malic_Acid', 
+'Ash', 
+'Ash_Alcanity',
+'Magnesium', 
+'Total_Phenols', 
+'Flavanoids', 
+'Nonflavanoid_Phenols',
+'Proanthocyanins', 
+'Color_Intensity', 
+'Hue', 
+'OD280', 
+'Proline'
+"""
+
+X["Malic_Acid"] = sc.fit_transform(X[["Malic_Acid"]])
+
+X.head(5)
+
+
+
+
+
+pca = PCA()
+X_pca = pca.fit_transform(X)
+
+
+
+
+
+explained_variance_ratio = pca.explained_variance_ratio_
+plt.plot(range(1, len(explained_variance_ratio) + 1), explained_variance_ratio.cumsum(), marker='o', 
+linestyle='--')
+plt.xlabel('Number of Principal Components')
+plt.ylabel('Cumulative Explained Variance')
+plt.title('Explained Variance Ratio')
+plt.show()
+
+
+
+
+
+
+n_components = 12 # Choose the desired number of principal components you want to reduce a dimention to
+pca = PCA(n_components=n_components)
+X_pca = pca.fit_transform(X)
+X_pca.shape
+X.shape
+red_indices = y[y == 1].index
+white_indices = y[y == 2].index
+
+
+
+
+
+plt.scatter(X_pca[red_indices, 0], X_pca[red_indices, 1], c='red', label='Red Wine')
+plt.scatter(X_pca[white_indices, 0], X_pca[white_indices, 1], c='blue', label='White Wine')
+plt.xlabel('Principal Component 1')
+plt.ylabel('Principal Component 2')
+plt.legend()
+plt.title('PCA: Red Wine vs. White Wine')
+plt.show()
+
+
+
+
+
+
+
+
